@@ -29,3 +29,16 @@ export const addRoutine = async (req, res, next) => {
     return next("DESTINATION_INVALID_ENTRIES");
   }
 };
+
+export const deactivateRoutine = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const queryDeactivateRoutine =
+      "UPDATE routines SET active = false WHERE id = $1";
+    await pool.query(queryDeactivateRoutine, [id]);
+    return res.status(200).send("Routine deactivated successfully.");
+  } catch (error) {
+    console.log(error.message);
+    return res.status(500).send("Error deactivating routine.");
+  }
+};
