@@ -42,3 +42,31 @@ export const deactivateRoutine = async (req, res, next) => {
     return res.status(500).send("Error deactivating routine.");
   }
 };
+export const completeRoutine = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    // Step 1: Get current value of the "complete" column
+
+    const queryGetCurrentValue = "SELECT complete FROM routines WHERE id = $1";
+    const currentValueResult = await pool.query(queryGetCurrentValue, [id]);
+    const currentValue = currentValueResult.rows[0].complete;
+
+    // Step 2: Toggle the value
+
+    const newValue = !currentValue;
+
+    //Step 3: update the column
+
+    const queryToggleComplete =
+      "UPDATE routines SET complete = $1 WHERE id = $2";
+    await pool.query(queryToggleComplete, [newValue, id]);
+
+    return res
+      .status(200)
+      .send("Routine completion status updated successfully.");
+  } catch (error) {
+    console.log(error.message);
+    return res.status(500).send("Error updating routine completion status.");
+  }
+};
