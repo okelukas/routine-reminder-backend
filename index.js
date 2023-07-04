@@ -4,6 +4,7 @@ import bodyParser from "body-parser";
 
 import homeRoutes from "./routes/homeRoute.js";
 import addRoutes from "./routes/addRoute.js";
+import authRoutes from "./routes/authRoutes.js";
 
 const app = express();
 
@@ -14,6 +15,7 @@ app.use(bodyParser.json());
 
 app.use("/api/home", homeRoutes);
 app.use("/api/add", addRoutes);
+app.use(authRoutes);
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
