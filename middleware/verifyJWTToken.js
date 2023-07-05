@@ -9,10 +9,14 @@ const verifyToken = async (req, res, next) => {
 
     if (!authorization) return next("please login");
     const token = authorization.split(" ")[1];
-    const { id } = jwt.verify(token, process.env.JWT_SECRET);
+    const { user_id } = jwt.verify(token, process.env.JWT_SECRET);
 
-    const myQuery = "SELECT * FROM users WHERE id = $1";
-    const { rows: user } = await pool.query(myQuery, [id]);
+    console.log(user_id);
+
+    const myQuery = "SELECT * FROM users WHERE user_id = $1";
+    const { rows: user } = await pool.query(myQuery, [user_id]);
+    console.log("using DB call!--> verifyUser");
+    console.log(user[0]);
     req.user = user[0];
     next();
   } catch (e) {

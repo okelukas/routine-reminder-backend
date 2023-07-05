@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { addRoutine } from "../controllers/homeControllers.js";
+import { addRoutine } from "../controller/homeControllers.js";
 
 const addRoutes = Router();
 

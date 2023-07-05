@@ -6,7 +6,10 @@ import { errorHandler } from "./middleware/errorHandler.js";
 
 import homeRoutes from "./routes/homeRoute.js";
 import addRoutes from "./routes/addRoute.js";
-import userRoute from "./routes/userRoute.js";
+//import authRouter from "./routes/authRouter.js";
+import JWTRouter from "./routes/JWTRoute.js";
+
+import verifyJWTToken from "./middleware/verifyJWTToken.js";
 
 const app = express();
 
@@ -15,9 +18,10 @@ app.use(cors());
 app.use(express.json());
 app.use(bodyParser.json());
 
-app.use("/", userRoute);
-app.use("/api/home", homeRoutes);
-app.use("/api/add", addRoutes);
+/* app.use("/auth", authRouter); */
+app.use("/jwt", JWTRouter);
+app.use("/api/home", verifyJWTToken, homeRoutes);
+app.use("/api/add", verifyJWTToken, addRoutes);
 
 app.use(errorHandler);
 

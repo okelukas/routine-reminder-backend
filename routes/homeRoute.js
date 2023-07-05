@@ -1,9 +1,9 @@
 import { Router } from "express";
-import { getRoutines } from "../controllers/homeControllers.js";
-import { deactivateRoutine } from "../controllers/homeControllers.js";
-import { completeRoutine } from "../controllers/homeControllers.js";
-import { editRoutine } from "../controllers/homeControllers.js";
-import { editRequest } from "../controllers/homeControllers.js";
+import { getRoutines } from "../controller/homeControllers.js";
+import { deactivateRoutine } from "../controller/homeControllers.js";
+import { completeRoutine } from "../controller/homeControllers.js";
+import { editRoutine } from "../controller/homeControllers.js";
+import { editRequest } from "../controller/homeControllers.js";
 
 const homeRoutes = Router();
 
