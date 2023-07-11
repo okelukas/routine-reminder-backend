@@ -1,4 +1,3 @@
-
 import bcrypt from "bcrypt";
 import pool from "../DB/client.js";
 import jwt from "jsonwebtoken";
@@ -62,18 +61,11 @@ export const signUpUser = async (req, res, next) => {
     } = response;
 
     //sign a token with user Id
-    const token = jwt.sign({ id: user_id }, process.env.JWT_SECRET);
+    const token = jwt.sign({ user_id: user_id }, process.env.JWT_SECRET);
 
     //return token
-    return res.status(201).send({ token: token, user_id: user_id });
+    return res.status(201).json(token);
   } catch (e) {
     next(e.message);
   }
-};
-
-export const getUser = (req, res) => {
-  //this route is guarded by our verify token middleware
-  console.log("it is working!");
-  //return user
-  res.json(req.user_id);
 };
