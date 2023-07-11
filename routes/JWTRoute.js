@@ -10,10 +10,8 @@ import {
 
 import {
   signInUser,
-  getUser,
   signUpUser,
 } from "../controller/JWTController.js";
-import verifyJWTToken from "../middleware/verifyJWTToken.js";
 
 const JWTRoutes = Router();
 
@@ -25,6 +23,5 @@ JWTRoutes.post(
   signUpUser
 );
 JWTRoutes.post("/login", signInUser);
-
 
 export default JWTRoutes;

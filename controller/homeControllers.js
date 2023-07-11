@@ -1,6 +1,5 @@
 import pool from "../DB/client.js";
 import jwt from "jsonwebtoken";
-import { getUser } from "./JWTController.js";
 
 const getUserID = (req) => {
   try {
@@ -73,7 +72,7 @@ export const deactivateRoutine = async (req, res, next) => {
     const { id } = req.params;
     const queryDeactivateRoutine =
       "UPDATE routines SET active = false WHERE routine_id = $1";
-      
+
     await pool.query(queryDeactivateRoutine, [id]);
     return res.status(200).send("Routine deactivated successfully.");
   } catch (error) {
@@ -81,6 +80,18 @@ export const deactivateRoutine = async (req, res, next) => {
     return res.status(500).send("Error deactivating routine.");
   }
 };
+export const reset = async (req, res, next) => {
+  try {
+    const user_id = getUserID(req);
+    const queryResetRoutines = `UPDATE routines SET complete = false WHERE routine_id IN (SELECT routine_id FROM user_routines WHERE user_id = ${user_id}`;
+    await pool.query(queryResetRoutines);
+    console.log("All routines reset to complete = false");
+  } catch (error) {
+    console.log(error.message);
+    return res.status(500).send("Error deactivating routine.");
+  }
+};
+
 export const completeRoutine = async (req, res, next) => {
   try {
     const { id } = req.params;
