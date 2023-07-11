@@ -24,7 +24,7 @@ JWTRoutes.post(
   checkUniqueUser,
   signUpUser
 );
-JWTRoutes.post("/signin", signInUser);
-JWTRoutes.get("/me", verifyJWTToken, getUser);
+JWTRoutes.post("/login", signInUser);
+
 
 export default JWTRoutes;

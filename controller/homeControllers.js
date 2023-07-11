@@ -1,10 +1,37 @@
 import pool from "../DB/client.js";
+import jwt from "jsonwebtoken";
+import { getUser } from "./JWTController.js";
+
+const getUserID = (req) => {
+  try {
+    const {
+      headers: { authorization },
+    } = req;
+
+    if (!authorization) {
+      throw new Error("Please login");
+    }
+    const token = authorization.split(" ")[1];
+
+    const { user_id } = jwt.verify(token, process.env.JWT_SECRET);
+    console.log(user_id);
+    return user_id;
+  } catch (e) {
+    next(e.message);
+  }
+};
 
 export const getRoutines = async (req, res, next) => {
   try {
-    const queryRoutines = "SELECT * FROM routines ORDER BY time";
+    const user_id = getUserID(req);
+    const queryRoutines = `SELECT *
+    FROM routines
+    INNER JOIN user_routines ON routines.routine_id = user_routines.routine_id
+    WHERE user_routines.user_id = ${user_id} AND routines.active = true
+    ORDER BY routines.time`;
+
     const { rows: routinesData } = await pool.query(queryRoutines);
-    console.log(routinesData);
+    // console.log("line 18: " + routinesData);
     return res.json(routinesData);
   } catch (e) {
     next(e.message);
@@ -15,15 +42,26 @@ export const addRoutine = async (req, res, next) => {
   try {
     const { routine, time } = req.body;
 
-    if ((!routine, !time)) {
+    if (!routine || !time) {
       return res.status(400).send("data missing");
     }
 
-    const queryAddRoutine =
-      "INSERT INTO routines (routine, time, active) VALUES ($1, $2, true) RETURNING *";
+    const user_id = getUserID(req);
 
-    const data = await pool.query(queryAddRoutine, [routine, time]);
-    return res.status(201).json(data.rows);
+    console.log(user_id + " line 57");
+
+    const queryAddRoutine =
+      "INSERT INTO routines (name, time, complete) VALUES ($1, $2, false) RETURNING routine_id";
+
+    const { rows } = await pool.query(queryAddRoutine, [routine, time]);
+    const routine_id = rows[0].routine_id;
+
+    // Link the routine to the user using the user_id and routine_id
+    const queryLinkRoutine =
+      "INSERT INTO user_routines (user_id, routine_id) VALUES ($1, $2)";
+    await pool.query(queryLinkRoutine, [user_id, routine_id]);
+
+    return res.status(201).json(rows);
   } catch (error) {
     console.log(error.message);
     return next("DESTINATION_INVALID_ENTRIES");
@@ -34,7 +72,8 @@ export const deactivateRoutine = async (req, res, next) => {
   try {
     const { id } = req.params;
     const queryDeactivateRoutine =
-      "UPDATE routines SET active = false WHERE id = $1";
+      "UPDATE routines SET active = false WHERE routine_id = $1";
+      
     await pool.query(queryDeactivateRoutine, [id]);
     return res.status(200).send("Routine deactivated successfully.");
   } catch (error) {
@@ -45,10 +84,12 @@ export const deactivateRoutine = async (req, res, next) => {
 export const completeRoutine = async (req, res, next) => {
   try {
     const { id } = req.params;
+    console.log(id);
 
     // Step 1: Get current value of the "complete" column
 
-    const queryGetCurrentValue = "SELECT complete FROM routines WHERE id = $1";
+    const queryGetCurrentValue =
+      "SELECT complete FROM routines WHERE routine_id = $1";
     const currentValueResult = await pool.query(queryGetCurrentValue, [id]);
     const currentValue = currentValueResult.rows[0].complete;
 
@@ -59,7 +100,7 @@ export const completeRoutine = async (req, res, next) => {
     //Step 3: update the column
 
     const queryToggleComplete =
-      "UPDATE routines SET complete = $1 WHERE id = $2";
+      "UPDATE routines SET complete = $1 WHERE routine_id = $2";
     await pool.query(queryToggleComplete, [newValue, id]);
 
     return res
@@ -75,10 +116,11 @@ export const editRoutine = async (req, res, next) => {
   try {
     const { id } = req.params;
     const { time, routine } = req.body;
-    const parsedId = parseInt(id, 10); // Convert id to integer
+    console.log("Hello");
+    //const parsedId = parseInt(id, 10); // Convert id to integer
     const queryEditRoutine =
-      "UPDATE routines SET time = $1, routine = $2 WHERE id = $3";
-    await pool.query(queryEditRoutine, [time, routine, parsedId]);
+      "UPDATE routines SET time = $1, name = $2 WHERE routine_id = $3";
+    await pool.query(queryEditRoutine, [time, routine, id]);
     return res.status(200).send("Routine edited successfully.");
   } catch (error) {
     console.log(error.message);
@@ -92,7 +134,8 @@ export const editRequest = async (req, res, next) => {
 
     // Step 1: Get current value of the "edit" column
 
-    const queryGetCurrentValue = "SELECT edit FROM routines WHERE id = $1";
+    const queryGetCurrentValue =
+      "SELECT edit FROM routines WHERE routine_id = $1";
     const currentValueResult = await pool.query(queryGetCurrentValue, [id]);
     const currentValue = currentValueResult.rows[0].edit;
 
@@ -102,7 +145,8 @@ export const editRequest = async (req, res, next) => {
 
     //Step 3: update the column
 
-    const queryToggleEdit = "UPDATE routines SET edit = $1 WHERE id = $2";
+    const queryToggleEdit =
+      "UPDATE routines SET edit = $1 WHERE routine_id = $2";
     await pool.query(queryToggleEdit, [newValue, id]);
 
     return res.status(200).send("Edit request status updated successfully.");

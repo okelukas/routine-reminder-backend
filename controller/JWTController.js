@@ -1,4 +1,4 @@
-import Jwt from "jsonwebtoken";
+
 import bcrypt from "bcrypt";
 import pool from "../DB/client.js";
 import jwt from "jsonwebtoken";
@@ -29,9 +29,9 @@ export const signInUser = async (req, res, next) => {
       { user_id: user[0].user_id },
       process.env.JWT_SECRET
     );
-    console.log(user[0].user_id);
+    //console.log(user[0].user_id);
 
-    return res.status(201).send({ token: token, user_id: user[0].user_id });
+    return res.status(201).json(token);
   } catch (e) {
     next(e.message);
   }
