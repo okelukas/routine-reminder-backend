@@ -83,13 +83,38 @@ export const deactivateRoutine = async (req, res, next) => {
 export const reset = async (req, res, next) => {
   try {
     const user_id = getUserID(req);
-    const queryResetRoutines = `UPDATE routines SET complete = false WHERE routine_id IN (SELECT routine_id FROM user_routines WHERE user_id = ${user_id}`;
+    const queryResetRoutines = `UPDATE routines SET complete = false WHERE routine_id IN (SELECT routine_id FROM user_routines WHERE user_id = ${user_id})`;
     await pool.query(queryResetRoutines);
     console.log("All routines reset to complete = false");
   } catch (error) {
     console.log(error.message);
     return res.status(500).send("Error deactivating routine.");
   }
+};
+
+export const setCookie = async (req, res, next) => {
+  const currentDate = new Date();
+
+  // Calculate the next occurrence of 3 am
+  const expirationTime = new Date();
+  expirationTime.setHours(3, 0, 0, 0); // Set the time to 3 am
+
+  if (currentDate > expirationTime) {
+    expirationTime.setDate(expirationTime.getDate() + 1);
+  }
+
+  const timeDifference = expirationTime.getTime() - currentDate.getTime();
+
+  // Set the cookie expiration time
+  const cookieExpiration = new Date();
+  cookieExpiration.setTime(currentDate.getTime() + timeDifference);
+
+  // Set the cookie
+  res.cookie("resetCookie", "activated", {
+    expires: cookieExpiration,
+    httpOnly: true,
+  });
+  res.send("activated");
 };
 
 export const completeRoutine = async (req, res, next) => {
