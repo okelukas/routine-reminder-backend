@@ -5,6 +5,7 @@ import { completeRoutine } from "../controller/homeControllers.js";
 import { editRoutine } from "../controller/homeControllers.js";
 import { editRequest } from "../controller/homeControllers.js";
 import { addRoutine } from "../controller/homeControllers.js";
+import { setCookie } from "../controller/homeControllers.js";
 import { reset } from "../controller/homeControllers.js";
 
 const homeRoutes = Router();
@@ -16,5 +17,6 @@ homeRoutes.route("/:id/complete").put(completeRoutine);
 homeRoutes.route("/:id/edit").put(editRoutine);
 homeRoutes.route("/:id/editrequest").put(editRequest);
 homeRoutes.route("/reset").put(reset);
+homeRoutes.route("/setCookie").put(setCookie);
 
 export default homeRoutes;

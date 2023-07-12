@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
+import cookieParser from "cookie-parser";
 
 import { errorHandler } from "./middleware/errorHandler.js";
 
@@ -15,7 +16,7 @@ const port = 3000;
 app.use(cors());
 app.use(express.json());
 app.use(bodyParser.json());
-
+app.use(cookieParser());
 
 app.use("/jwt", JWTRouter);
 app.use("/api/home", verifyJWTToken, homeRoutes);
