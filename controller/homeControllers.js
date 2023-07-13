@@ -39,9 +39,9 @@ export const getRoutines = async (req, res, next) => {
 
 export const addRoutine = async (req, res, next) => {
   try {
-    const { routine, time } = req.body;
+    const { name, time, daily, weekdays } = req.body;
 
-    if (!routine || !time) {
+    if (!name || !time) {
       return res.status(400).send("data missing");
     }
 
@@ -50,9 +50,14 @@ export const addRoutine = async (req, res, next) => {
     console.log(user_id + " line 57");
 
     const queryAddRoutine =
-      "INSERT INTO routines (name, time, complete) VALUES ($1, $2, false) RETURNING routine_id";
+      "INSERT INTO routines (name, time, complete, daily, weekdays) VALUES ($1, $2, false, $3, $4) RETURNING routine_id";
 
-    const { rows } = await pool.query(queryAddRoutine, [routine, time]);
+    const { rows } = await pool.query(queryAddRoutine, [
+      name,
+      time,
+      daily,
+      weekdays,
+    ]);
     const routine_id = rows[0].routine_id;
 
     // Link the routine to the user using the user_id and routine_id
