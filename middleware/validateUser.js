@@ -26,6 +26,15 @@ const validateUserInput = (req, res, next) => {
     return next({ message: "Password needs min. 8 characters!" });
   return next();
 };
+const validateEmailAndUsername = (req, res, next) => {
+  const { email, username } = req.body;
+  const validEmail = validator.isEmail(email);
+  if (!validEmail) return next({ message: "Invalid e-mail address!" });
+  const validUsername = validator.isAlphanumeric(username);
+  if (!validUsername)
+    return next({ message: "Only alphanumeric username allowed!" });
+  return next();
+};
 
 const checkUniqueUser = async (req, res, next) => {
   try {
@@ -58,4 +67,5 @@ export {
   checkUniqueUser,
   validateUserInput,
   findOneUser,
+  validateEmailAndUsername
 };

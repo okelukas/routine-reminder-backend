@@ -169,30 +169,18 @@ export const editRoutine = async (req, res, next) => {
   }
 };
 
-export const editRequest = async (req, res, next) => {
+export const editEntireRoutine = async (req, res, next) => {
   try {
     const { id } = req.params;
-
-    // Step 1: Get current value of the "edit" column
-
-    const queryGetCurrentValue =
-      "SELECT edit FROM routines WHERE routine_id = $1";
-    const currentValueResult = await pool.query(queryGetCurrentValue, [id]);
-    const currentValue = currentValueResult.rows[0].edit;
-
-    // Step 2: Toggle the value
-
-    const newValue = !currentValue;
-
-    //Step 3: update the column
-
-    const queryToggleEdit =
-      "UPDATE routines SET edit = $1 WHERE routine_id = $2";
-    await pool.query(queryToggleEdit, [newValue, id]);
-
-    return res.status(200).send("Edit request status updated successfully.");
+    const { time, routine, daily, weekdays } = req.body;
+    console.log("Hello");
+    //const parsedId = parseInt(id, 10); // Convert id to integer
+    const queryEditRoutine =
+      "UPDATE routines SET time = $1, name = $2, daily = $3, weekdays = $4 WHERE routine_id = $5";
+    await pool.query(queryEditRoutine, [time, routine, daily, weekdays, id]);
+    return res.status(200).send("Entire routine edited successfully.");
   } catch (error) {
     console.log(error.message);
-    return res.status(500).send("Error updating edit request status.");
+    return res.status(500).send("Error editing entire routine.");
   }
 };
