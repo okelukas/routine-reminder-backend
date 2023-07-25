@@ -6,6 +6,7 @@ import cookieParser from "cookie-parser";
 import { errorHandler } from "./middleware/errorHandler.js";
 
 import homeRoutes from "./routes/homeRoute.js";
+import profileRoutes from "./routes/profileRoute.js";
 import JWTRouter from "./routes/JWTRoute.js";
 
 import verifyJWTToken from "./middleware/verifyJWTToken.js";
@@ -20,6 +21,7 @@ app.use(cookieParser());
 
 app.use("/jwt", JWTRouter);
 app.use("/api/home", verifyJWTToken, homeRoutes);
+app.use("/api/profile", verifyJWTToken, profileRoutes);
 
 app.use(errorHandler);
 
