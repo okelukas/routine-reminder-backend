@@ -3,7 +3,7 @@ const { Pool } = pkg;
 import "dotenv/config";
 
 const pool = new Pool({
-  connectionString: process.env.Connection_String,
+  connectionString: process.env.CONNECTION_STRING,
 });
 
 pool.connect((err) => {
